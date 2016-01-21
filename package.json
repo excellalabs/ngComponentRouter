@@ -1,6 +1,6 @@
 {
   "name": "ngcomponentrouter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Angular 2 Component Router for Angular 1",
   "main": "angular_1_router.js",
   "scripts": {
