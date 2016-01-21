@@ -1,0 +1,24 @@
+{
+  "name": "ngcomponentrouter",
+  "version": "1.0.1",
+  "description": "Angular 2 Component Router for Angular 1",
+  "main": "angular_1_router.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://duluca@github.com/excellalabs/ngComponentRouter.git"
+  },
+  "keywords": [
+    "angular",
+    "component",
+    "router"
+  ],
+  "author": "angular-core-team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/excellalabs/ngComponentRouter/issues"
+  },
+  "homepage": "https://github.com/excellalabs/ngComponentRouter#readme"
+}
