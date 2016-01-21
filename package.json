@@ -11,6 +11,7 @@
     "url": "git+https://duluca@github.com/excellalabs/ngComponentRouter.git"
   },
   "keywords": [
+    "ng",
     "angular",
     "component",
     "router"
