@@ -66,7 +66,7 @@ function ngOutletDirective($animate, $q, $router) {
         transclude: 'element',
         terminal: true,
         priority: 400,
-        require1: ['?^^ngOutlet', 'ngOutlet'],
+        require: ['?^^ngOutlet', 'ngOutlet'],
         link: outletLink,
         controller: (function () {
             function class_1() {
@@ -173,7 +173,7 @@ function ngOutletFillContentDirective($compile) {
     return {
         restrict: 'EA',
         priority: -400,
-        require1: 'ngOutlet',
+        require: 'ngOutlet',
         link: function (scope, element, attrs, ctrl) {
             var template = ctrl.$$template;
             element.html(template);
@@ -215,7 +215,7 @@ function ngOutletFillContentDirective($compile) {
  */
 function ngLinkDirective($router, $parse) {
     var rootRouter = $router;
-    return { require1: '?^^ngOutlet', restrict: 'A', link: ngLinkDirectiveLinkFn };
+    return { require: '?^^ngOutlet', restrict: 'A', link: ngLinkDirectiveLinkFn };
     function ngLinkDirectiveLinkFn(scope, element, attrs, ctrl) {
         var router = (ctrl && ctrl.$$router) || rootRouter;
         if (!router) {
