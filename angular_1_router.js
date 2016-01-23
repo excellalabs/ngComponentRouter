@@ -522,6 +522,10 @@ var ListWrapper = {
 };
 
 var StringWrapper = {
+  charCodeAt: function(s, at) {
+    return s.charCodeAt(at);
+  },
+
   equals: function (s1, s2) {
     return s1 === s2;
   },
