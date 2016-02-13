@@ -3,6 +3,9 @@ Angular 2 Component Router for Angular 1
 
 This is an extract directly built from Angular 2 source code without modification. Adding this as an npm package, because Angular hasn't released an official version yet. 
 
+## Sample Usage
+Check out https://github.com/duluca/angular1.5-starter for sample usage (or to reproduce any errors or issues)
+
 ## Based on Angular 2 Commit
 e72dc16dbe4afa3428c4524901cbd2501a84a98b
 
