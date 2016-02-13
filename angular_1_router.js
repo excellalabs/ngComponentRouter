@@ -600,7 +600,7 @@ Location.prototype.go = function (path, query) {
     OpaqueToken: function () {},
     Inject: function () {}
   };
-  var require = function () {return exports;};
+  var require1 = function () {return exports;};
 
   // When this file is processed, the line below is replaced with
   // the contents of the compiled TypeScript classes.
@@ -847,8 +847,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var instruction_1 = require('./instruction');
-var path_recognizer_1 = require('./path_recognizer');
+var instruction_1 = require1('./instruction');
+var path_recognizer_1 = require1('./path_recognizer');
 var RouteMatch = (function () {
     function RouteMatch() {
     }
@@ -953,7 +953,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var route_definition_1 = require('./route_definition');
+var route_definition_1 = require1('./route_definition');
 exports.RouteDefinition = route_definition_1.RouteDefinition;
 /**
  * The `RouteConfig` decorator defines routes for a given component.
@@ -1129,7 +1129,7 @@ var Redirect = (function () {
     return Redirect;
 })();
 exports.Redirect = Redirect;
-var instruction_1 = require('./instruction');
+var instruction_1 = require1('./instruction');
 var AsyncRouteHandler = (function () {
     function AsyncRouteHandler(_loader, data) {
         if (data === void 0) { data = null; }
@@ -1151,7 +1151,7 @@ var AsyncRouteHandler = (function () {
     return AsyncRouteHandler;
 })();
 exports.AsyncRouteHandler = AsyncRouteHandler;
-var instruction_1 = require('./instruction');
+var instruction_1 = require1('./instruction');
 var SyncRouteHandler = (function () {
     function SyncRouteHandler(componentType, data) {
         this.componentType = componentType;
@@ -1164,10 +1164,10 @@ var SyncRouteHandler = (function () {
     return SyncRouteHandler;
 })();
 exports.SyncRouteHandler = SyncRouteHandler;
-var route_recognizer_1 = require('./route_recognizer');
-var route_config_impl_1 = require('./route_config_impl');
-var async_route_handler_1 = require('./async_route_handler');
-var sync_route_handler_1 = require('./sync_route_handler');
+var route_recognizer_1 = require1('./route_recognizer');
+var route_config_impl_1 = require1('./route_config_impl');
+var async_route_handler_1 = require1('./async_route_handler');
+var sync_route_handler_1 = require1('./sync_route_handler');
 /**
  * `ComponentRecognizer` is responsible for recognizing routes for a single component.
  * It is consumed by `RouteRegistry`, which knows how to recognize an entire hierarchy of
@@ -1623,7 +1623,7 @@ var ComponentInstruction = (function () {
     return ComponentInstruction;
 })();
 exports.ComponentInstruction = ComponentInstruction;
-var url_parser_1 = require('./url_parser');
+var url_parser_1 = require1('./url_parser');
 var TouchMap = (function () {
     function TouchMap(map) {
         var _this = this;
@@ -1861,7 +1861,7 @@ var PathRecognizer = (function () {
     return PathRecognizer;
 })();
 exports.PathRecognizer = PathRecognizer;
-var route_config_decorator_1 = require('./route_config_decorator');
+var route_config_decorator_1 = require1('./route_config_decorator');
 /**
  * Given a JS Object that represents a route config, returns a corresponding Route, AsyncRoute,
  * AuxRoute or Redirect object.
@@ -1952,7 +1952,7 @@ function assertComponentExists(component, path) {
     }
 }
 exports.assertComponentExists = assertComponentExists;
-var lifecycle_annotations_impl_1 = require('./lifecycle_annotations_impl');
+var lifecycle_annotations_impl_1 = require1('./lifecycle_annotations_impl');
 function hasLifecycleHook(e, type) {
     if (!(type instanceof Type))
         return false;
@@ -1970,13 +1970,13 @@ function getCanActivateHook(type) {
     return null;
 }
 exports.getCanActivateHook = getCanActivateHook;
-var core_1 = require('angular2/core');
-var route_config_impl_1 = require('./route_config_impl');
-var route_recognizer_1 = require('./route_recognizer');
-var component_recognizer_1 = require('./component_recognizer');
-var instruction_1 = require('./instruction');
-var route_config_nomalizer_1 = require('./route_config_nomalizer');
-var url_parser_1 = require('./url_parser');
+var core_1 = require1('angular2/core');
+var route_config_impl_1 = require1('./route_config_impl');
+var route_recognizer_1 = require1('./route_recognizer');
+var component_recognizer_1 = require1('./component_recognizer');
+var instruction_1 = require1('./instruction');
+var route_config_nomalizer_1 = require1('./route_config_nomalizer');
+var url_parser_1 = require1('./url_parser');
 var _resolveToNull = PromiseWrapper.resolve(null);
 /**
  * Token used to bind the component with the top-level {@link RouteConfig}s for the
@@ -2406,7 +2406,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var route_lifecycle_reflector_1 = require('./route_lifecycle_reflector');
+var route_lifecycle_reflector_1 = require1('./route_lifecycle_reflector');
 var _resolveToTrue = PromiseWrapper.resolve(true);
 var _resolveToFalse = PromiseWrapper.resolve(false);
 /**
