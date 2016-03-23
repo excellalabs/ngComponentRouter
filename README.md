@@ -9,7 +9,7 @@ Check out https://github.com/duluca/angular1.5-starter for sample usage (or to r
 For more usage scenarios, check out https://github.com/brandonroberts/angularjs-component-router
 
 ## Based on Angular 2 Commit
-e72dc16dbe4afa3428c4524901cbd2501a84a98b
+3739588e97591f6fa102f8afd0b2248ff692eeca
 
 ## Procedure of Extraction
 As discussed on https://github.com/angular/angular.js/issues/12926.
