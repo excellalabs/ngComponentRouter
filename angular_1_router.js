@@ -3090,7 +3090,7 @@ function canActivateOne(nextInstruction, prevInstruction) {
         controller.$routeConfig.forEach(function (config) {
           var loader = config.loader;
           if (isPresent(loader)) {
-            config = angular.extend({}, config, { loader: () => $injector.invoke(loader) });
+              config = angular.extend({}, config, { loader: $injector.invoke(loader) });
           }
           that.config(component, config);
         });
