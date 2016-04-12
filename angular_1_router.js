@@ -719,6 +719,11 @@ function matchUrlSegment(str) {
     var match = RegExpWrapper.firstMatch(SEGMENT_RE, str);
     return isPresent(match) ? match[0] : '';
 }
+var QUERY_PARAM_VALUE_RE = RegExpWrapper.create('^[^\\(\\)\\?;&#]+');
+function matchUrlQueryParamValue(str) {
+    var match = RegExpWrapper.firstMatch(QUERY_PARAM_VALUE_RE, str);
+    return isPresent(match) ? match[0] : '';
+}
 var UrlParser = (function () {
     function UrlParser() {
     }
@@ -790,10 +795,10 @@ var UrlParser = (function () {
     UrlParser.prototype.parseQueryParams = function () {
         var params = {};
         this.capture('?');
-        this.parseParam(params);
+        this.parseQueryParam(params);
         while (this._remaining.length > 0 && this.peekStartsWith('&')) {
             this.capture('&');
-            this.parseParam(params);
+            this.parseQueryParam(params);
         }
         return params;
     };
@@ -815,6 +820,23 @@ var UrlParser = (function () {
         if (this.peekStartsWith('=')) {
             this.capture('=');
             var valueMatch = matchUrlSegment(this._remaining);
+            if (isPresent(valueMatch)) {
+                value = valueMatch;
+                this.capture(value);
+            }
+        }
+        params[key] = value;
+    };
+    UrlParser.prototype.parseQueryParam = function (params) {
+        var key = matchUrlSegment(this._remaining);
+        if (isBlank(key)) {
+            return;
+        }
+        this.capture(key);
+        var value = true;
+        if (this.peekStartsWith('=')) {
+            this.capture('=');
+            var valueMatch = matchUrlQueryParamValue(this._remaining);
             if (isPresent(valueMatch)) {
                 value = valueMatch;
                 this.capture(value);
@@ -864,11 +886,11 @@ var CanActivate = (function () {
     return CanActivate;
 })();
 exports.CanActivate = CanActivate;
-exports.routerCanReuse = CONST_EXPR(new RouteLifecycleHook("routerCanReuse"));
-exports.routerCanDeactivate = CONST_EXPR(new RouteLifecycleHook("routerCanDeactivate"));
-exports.routerOnActivate = CONST_EXPR(new RouteLifecycleHook("routerOnActivate"));
-exports.routerOnReuse = CONST_EXPR(new RouteLifecycleHook("routerOnReuse"));
-exports.routerOnDeactivate = CONST_EXPR(new RouteLifecycleHook("routerOnDeactivate"));
+exports.routerCanReuse = CONST_EXPR(new RouteLifecycleHook('routerCanReuse'));
+exports.routerCanDeactivate = CONST_EXPR(new RouteLifecycleHook('routerCanDeactivate'));
+exports.routerOnActivate = CONST_EXPR(new RouteLifecycleHook('routerOnActivate'));
+exports.routerOnReuse = CONST_EXPR(new RouteLifecycleHook('routerOnReuse'));
+exports.routerOnDeactivate = CONST_EXPR(new RouteLifecycleHook('routerOnDeactivate'));
 var lifecycle_annotations_impl_1 = routerRequire('./lifecycle_annotations_impl');
 function hasLifecycleHook(e, type) {
     if (!(type instanceof Type))
@@ -1293,9 +1315,10 @@ exports.RedirectRule = RedirectRule;
 // represents something like '/foo/:bar'
 var RouteRule = (function () {
     // TODO: cache component instruction instances by params and by ParsedUrl instance
-    function RouteRule(_routePath, handler) {
+    function RouteRule(_routePath, handler, _routeName) {
         this._routePath = _routePath;
         this.handler = handler;
+        this._routeName = _routeName;
         this._cache = new Map();
         this.specificity = this._routePath.specificity;
         this.hash = this._routePath.hash;
@@ -1335,7 +1358,7 @@ var RouteRule = (function () {
         if (this._cache.has(hashKey)) {
             return this._cache.get(hashKey);
         }
-        var instruction = new instruction_1.ComponentInstruction(urlPath, urlParams, this.handler.data, this.handler.componentType, this.terminal, this.specificity, params);
+        var instruction = new instruction_1.ComponentInstruction(urlPath, urlParams, this.handler.data, this.handler.componentType, this.terminal, this.specificity, params, this._routeName);
         this._cache.set(hashKey, instruction);
         return instruction;
     };
@@ -1378,7 +1401,7 @@ var RuleSet = (function () {
         if (config instanceof route_config_impl_1.AuxRoute) {
             handler = new sync_route_handler_1.SyncRouteHandler(config.component, config.data);
             var routePath_1 = this._getRoutePath(config);
-            var auxRule = new rules_1.RouteRule(routePath_1, handler);
+            var auxRule = new rules_1.RouteRule(routePath_1, handler, config.name);
             this.auxRulesByPath.set(routePath_1.toString(), auxRule);
             if (isPresent(config.name)) {
                 this.auxRulesByName.set(config.name, auxRule);
@@ -1402,7 +1425,7 @@ var RuleSet = (function () {
             useAsDefault = isPresent(config.useAsDefault) && config.useAsDefault;
         }
         var routePath = this._getRoutePath(config);
-        var newRule = new rules_1.RouteRule(routePath, handler);
+        var newRule = new rules_1.RouteRule(routePath, handler, config.name);
         this._assertNoHashCollision(newRule.hash, config.path);
         if (useAsDefault) {
             if (isPresent(this.defaultRule)) {
@@ -1556,7 +1579,7 @@ var DynamicPathSegment = (function () {
         if (!StringMapWrapper.contains(params.map, this.name)) {
             throw new BaseException("Route generator for '" + this.name + "' was not included in parameters passed.");
         }
-        return utils_1.normalizeString(params.get(this.name));
+        return encodeDynamicSegment(utils_1.normalizeString(params.get(this.name)));
     };
     DynamicPathSegment.paramMatcher = /^:([^\/]+)$/g;
     return DynamicPathSegment;
@@ -1615,7 +1638,7 @@ var ParamRoutePath = (function () {
                 }
                 captured.push(currentUrlSegment.path);
                 if (pathSegment instanceof DynamicPathSegment) {
-                    positionalParams[pathSegment.name] = currentUrlSegment.path;
+                    positionalParams[pathSegment.name] = decodeDynamicSegment(currentUrlSegment.path);
                 }
                 else if (!pathSegment.match(currentUrlSegment.path)) {
                     return null;
@@ -1665,7 +1688,7 @@ var ParamRoutePath = (function () {
     ParamRoutePath.prototype._parsePathString = function (routePath) {
         // normalize route as not starting with a "/". Recognition will
         // also normalize.
-        if (routePath.startsWith("/")) {
+        if (routePath.startsWith('/')) {
             routePath = routePath.substring(1);
         }
         var segmentStrings = routePath.split('/');
@@ -1738,6 +1761,38 @@ var ParamRoutePath = (function () {
     return ParamRoutePath;
 })();
 exports.ParamRoutePath = ParamRoutePath;
+var REGEXP_PERCENT = /%/g;
+var REGEXP_SLASH = /\//g;
+var REGEXP_OPEN_PARENT = /\(/g;
+var REGEXP_CLOSE_PARENT = /\)/g;
+var REGEXP_SEMICOLON = /;/g;
+function encodeDynamicSegment(value) {
+    if (isBlank(value)) {
+        return null;
+    }
+    value = StringWrapper.replaceAll(value, REGEXP_PERCENT, '%25');
+    value = StringWrapper.replaceAll(value, REGEXP_SLASH, '%2F');
+    value = StringWrapper.replaceAll(value, REGEXP_OPEN_PARENT, '%28');
+    value = StringWrapper.replaceAll(value, REGEXP_CLOSE_PARENT, '%29');
+    value = StringWrapper.replaceAll(value, REGEXP_SEMICOLON, '%3B');
+    return value;
+}
+var REGEXP_ENC_SEMICOLON = /%3B/ig;
+var REGEXP_ENC_CLOSE_PARENT = /%29/ig;
+var REGEXP_ENC_OPEN_PARENT = /%28/ig;
+var REGEXP_ENC_SLASH = /%2F/ig;
+var REGEXP_ENC_PERCENT = /%25/ig;
+function decodeDynamicSegment(value) {
+    if (isBlank(value)) {
+        return null;
+    }
+    value = StringWrapper.replaceAll(value, REGEXP_ENC_SEMICOLON, ';');
+    value = StringWrapper.replaceAll(value, REGEXP_ENC_CLOSE_PARENT, ')');
+    value = StringWrapper.replaceAll(value, REGEXP_ENC_OPEN_PARENT, '(');
+    value = StringWrapper.replaceAll(value, REGEXP_ENC_SLASH, '/');
+    value = StringWrapper.replaceAll(value, REGEXP_ENC_PERCENT, '%');
+    return value;
+}
 var route_path_1 = routerRequire('./route_path');
 var RegexRoutePath = (function () {
     function RegexRoutePath(_reString, _serializer) {
@@ -2089,7 +2144,7 @@ var ComponentInstruction = (function () {
     /**
      * @internal
      */
-    function ComponentInstruction(urlPath, urlParams, data, componentType, terminal, specificity, params) {
+    function ComponentInstruction(urlPath, urlParams, data, componentType, terminal, specificity, params, routeName) {
         if (params === void 0) { params = null; }
         this.urlPath = urlPath;
         this.urlParams = urlParams;
@@ -2097,6 +2152,7 @@ var ComponentInstruction = (function () {
         this.terminal = terminal;
         this.specificity = specificity;
         this.params = params;
+        this.routeName = routeName;
         this.reuse = false;
         this.routeData = isPresent(data) ? data : exports.BLANK_ROUTE_DATA;
     }
@@ -2652,13 +2708,29 @@ var Router = (function () {
      * otherwise `false`.
      */
     Router.prototype.isRouteActive = function (instruction) {
+        var _this = this;
         var router = this;
+        if (isBlank(this.currentInstruction)) {
+            return false;
+        }
+        // `instruction` corresponds to the root router
         while (isPresent(router.parent) && isPresent(instruction.child)) {
             router = router.parent;
             instruction = instruction.child;
         }
-        return isPresent(this.currentInstruction) &&
-            this.currentInstruction.component == instruction.component;
+        if (isBlank(instruction.component) || isBlank(this.currentInstruction.component) ||
+            this.currentInstruction.component.routeName != instruction.component.routeName) {
+            return false;
+        }
+        var paramEquals = true;
+        if (isPresent(this.currentInstruction.component.params)) {
+            StringMapWrapper.forEach(instruction.component.params, function (value, key) {
+                if (_this.currentInstruction.component.params[key] !== value) {
+                    paramEquals = false;
+                }
+            });
+        }
+        return paramEquals;
     };
     /**
      * Dynamically update the routing configuration and trigger a navigation.
@@ -2756,11 +2828,9 @@ var Router = (function () {
             if (!result) {
                 return false;
             }
-            return _this._routerCanDeactivate(instruction)
-                .then(function (result) {
+            return _this._routerCanDeactivate(instruction).then(function (result) {
                 if (result) {
-                    return _this.commit(instruction, _skipLocationChange)
-                        .then(function (_) {
+                    return _this.commit(instruction, _skipLocationChange).then(function (_) {
                         _this._emitNavigationFinish(instruction.toRootUrl());
                         return true;
                     });
@@ -2769,6 +2839,7 @@ var Router = (function () {
         });
     };
     Router.prototype._emitNavigationFinish = function (url) { ObservableWrapper.callEmit(this._subject, url); };
+    /** @internal */
     Router.prototype._emitNavigationFail = function (url) { ObservableWrapper.callError(this._subject, url); };
     Router.prototype._afterPromiseFinishNavigating = function (promise) {
         var _this = this;
@@ -2789,8 +2860,7 @@ var Router = (function () {
         if (isBlank(instruction.component)) {
             return _resolveToTrue;
         }
-        return this._outlet.routerCanReuse(instruction.component)
-            .then(function (result) {
+        return this._outlet.routerCanReuse(instruction.component).then(function (result) {
             instruction.component.reuse = result;
             if (result && isPresent(_this._childRouter) && isPresent(instruction.child)) {
                 return _this._childRouter._routerCanReuse(instruction.child);
@@ -2826,6 +2896,8 @@ var Router = (function () {
                 return false;
             }
             if (isPresent(_this._childRouter)) {
+                // TODO: ideally, this closure would map to async-await in Dart.
+                // For now, casting to any to suppress an error.
                 return _this._childRouter._routerCanDeactivate(childInstruction);
             }
             return true;
@@ -2939,11 +3011,9 @@ var RootRouter = (function (_super) {
         this._location = location;
         this._locationSub = this._location.subscribe(function (change) {
             // we call recognize ourselves
-            _this.recognize(change['url'])
-                .then(function (instruction) {
+            _this.recognize(change['url']).then(function (instruction) {
                 if (isPresent(instruction)) {
-                    _this.navigateByInstruction(instruction, isPresent(change['pop']))
-                        .then(function (_) {
+                    _this.navigateByInstruction(instruction, isPresent(change['pop'])).then(function (_) {
                         // this is a popstate event; no need to change the URL
                         if (isPresent(change['pop']) && change['type'] != 'hashchange') {
                             return;
@@ -2953,9 +3023,11 @@ var RootRouter = (function (_super) {
                         if (emitPath.length > 0 && emitPath[0] != '/') {
                             emitPath = '/' + emitPath;
                         }
-                        // Because we've opted to use All hashchange events occur outside Angular.
+                        // We've opted to use pushstate and popState APIs regardless of whether you
+                        // an app uses HashLocationStrategy or PathLocationStrategy.
                         // However, apps that are migrating might have hash links that operate outside
                         // angular to which routing must respond.
+                        // Therefore we know that all hashchange events occur outside Angular.
                         // To support these cases where we respond to hashchanges and redirect as a
                         // result, we need to replace the top item on the stack.
                         if (change['type'] == 'hashchange') {
@@ -3090,7 +3162,7 @@ function canActivateOne(nextInstruction, prevInstruction) {
         controller.$routeConfig.forEach(function (config) {
           var loader = config.loader;
           if (isPresent(loader)) {
-              config = angular.extend({}, config, { loader: $injector.invoke(loader) });
+            config = angular.extend({}, config, { loader: $injector.invoke(loader) });
           }
           that.config(component, config);
         });

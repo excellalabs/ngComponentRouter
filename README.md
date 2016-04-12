@@ -9,7 +9,7 @@ Check out https://github.com/duluca/angular1.5-starter for sample usage (or to r
 For more usage scenarios, check out https://github.com/brandonroberts/angularjs-component-router
 
 ## Based on Angular 2 Commit
-3739588e97591f6fa102f8afd0b2248ff692eeca
+03627aa84d90f7f1d8d62f160997b783fdf9eaa4
 
 ## Procedure of Extraction
 As discussed on https://github.com/angular/angular.js/issues/12926.
@@ -19,6 +19,9 @@ As discussed on https://github.com/angular/angular.js/issues/12926.
 - Go into the angular2 directory and install the dependencies `cd angular2` and `npm install`
 - After npm finishes, run the gulp command to build the router file `gulp buildRouter.dev`
 - The angular_1_router.js file will be in your angular2/dist folder.
+
+## Changes applied
+- Replaced unnecessary arrow function on line 3165: config = angular.extend({}, config, { loader: $injector.invoke(loader) });
 
 ## Alternatives
 This package is out there solely for convenience. You may directly import the router from Angular's npm package. Read more about on https://github.com/angular/angular.js/issues/12926.
