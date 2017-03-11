@@ -1,12 +1,14 @@
 # ngComponentRouter
-Angular 2 Component Router for Angular 1
+> Angular 2 Style Component Router for Angular 1
 
 This is an extract directly built from Angular 2 source code without modification. Adding this as an npm package, because Angular hasn't released an official version yet. 
 
-## Sample Usage
-Check out https://github.com/duluca/angular1.5-starter for sample usage (or to reproduce any errors or issues)
+## Quick Start
+For a complete example of how to leverage majority of the features of the router, see https://github.com/duluca/angular1.5-starter. Fork it, create issues with it, otherwise just clone it and use it.
 
-For more usage scenarios, check out https://github.com/brandonroberts/angularjs-component-router
+> Note that Angular 1.5.11 is last version of Angular this router and my starter project will work in. However, using this router, Angular Material 1.1.3 and Angular 1.5.11, you can build great production quality applications. The component architecture allows you to follow clean code and SOLID principals, where you can build multi-hundred view apps without your code architecture collapsing under its own weight. Meanwhile you'll be introduced to concepts that form the basis of Angular 2, while leveraging your Angular 1.x skills. If you're looking for a 3-5+ year solution, I highly recommend you start with Angular 2, as that is the foundational framework that'll be supported for Angular v.Next beyond Angular 2.
+
+For more usage examples of the router and an alternate code architecture, check out https://github.com/brandonroberts/angularjs-component-router.
 
 ## Based on Angular 2 Commit
 03627aa84d90f7f1d8d62f160997b783fdf9eaa4
